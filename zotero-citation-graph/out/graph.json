@@ -74,7 +74,7 @@
       "id": "10.1000/onc.0006",
       "label": "Tirosh 2019",
       "title": "Single-cell RNA sequencing reveals transcriptomic heterogeneity across tumor genomes",
-      "authors": "Tirosh",
+      "authors": "Tirosh, Izar, Prakadan, Wadsworth, Treacy, Trombetta, Rotem, Rodman, Garraway",
       "year": "2019",
       "venue": "Science",
       "doi": "10.1000/onc.0006",
@@ -288,7 +288,7 @@
       "count": 1
     }
   ],
-  "generated": "2026-06-14 15:37 UTC",
+  "generated": "2026-06-14 15:47 UTC",
   "stats": {
     "papers": 12,
     "edges": 20,

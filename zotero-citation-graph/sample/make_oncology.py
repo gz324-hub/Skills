@@ -54,7 +54,9 @@ PAPERS = {
         "tumor genomes",
         "Single-cell RNA sequencing exposes genomic and transcriptomic "
         "heterogeneity and somatic mutation patterns.",
-        [("A.", "Tirosh")], "2019", "10.1000/onc.0006", "Science"),
+        [("A.", "Tirosh"), ("B.", "Izar"), ("S.", "Prakadan"), ("M.", "Wadsworth"),
+         ("D.", "Treacy"), ("J.", "Trombetta"), ("A.", "Rotem"), ("C.", "Rodman"),
+         ("L.", "Garraway")], "2019", "10.1000/onc.0006", "Science"),
     "hallmarks_review": (
         "The hallmarks of cancer: a review of emerging therapeutic perspectives",
         "A comprehensive review and perspective on the hallmarks of cancer and "
