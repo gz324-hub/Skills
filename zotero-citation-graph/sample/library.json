@@ -1,0 +1,288 @@
+[
+  {
+    "id": "krizhevsky2017",
+    "type": "article-journal",
+    "title": "ImageNet classification with deep convolutional neural networks",
+    "author": [
+      {
+        "given": "Alex",
+        "family": "Krizhevsky"
+      },
+      {
+        "given": "Ilya",
+        "family": "Sutskever"
+      },
+      {
+        "given": "Geoffrey E.",
+        "family": "Hinton"
+      }
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          2017
+        ]
+      ]
+    },
+    "DOI": "10.1145/3065386",
+    "container-title": "Communications of the ACM",
+    "URL": ""
+  },
+  {
+    "id": "lecun2015",
+    "type": "article-journal",
+    "title": "Deep learning",
+    "author": [
+      {
+        "given": "Yann",
+        "family": "LeCun"
+      },
+      {
+        "given": "Yoshua",
+        "family": "Bengio"
+      },
+      {
+        "given": "Geoffrey",
+        "family": "Hinton"
+      }
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          2015
+        ]
+      ]
+    },
+    "DOI": "10.1038/nature14539",
+    "container-title": "Nature",
+    "URL": ""
+  },
+  {
+    "id": "he2016",
+    "type": "paper-conference",
+    "title": "Deep residual learning for image recognition",
+    "author": [
+      {
+        "given": "Kaiming",
+        "family": "He"
+      },
+      {
+        "given": "Xiangyu",
+        "family": "Zhang"
+      },
+      {
+        "given": "Shaoqing",
+        "family": "Ren"
+      },
+      {
+        "given": "Jian",
+        "family": "Sun"
+      }
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          2016
+        ]
+      ]
+    },
+    "DOI": "10.1109/CVPR.2016.90",
+    "container-title": "Proc. CVPR",
+    "URL": ""
+  },
+  {
+    "id": "szegedy2015",
+    "type": "paper-conference",
+    "title": "Going deeper with convolutions",
+    "author": [
+      {
+        "given": "Christian",
+        "family": "Szegedy"
+      },
+      {
+        "given": "Wei",
+        "family": "Liu"
+      },
+      {
+        "given": "Yangqing",
+        "family": "Jia"
+      }
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          2015
+        ]
+      ]
+    },
+    "DOI": "10.1109/CVPR.2015.7298594",
+    "container-title": "Proc. CVPR",
+    "URL": ""
+  },
+  {
+    "id": "mnih2015",
+    "type": "article-journal",
+    "title": "Human-level control through deep reinforcement learning",
+    "author": [
+      {
+        "given": "Volodymyr",
+        "family": "Mnih"
+      },
+      {
+        "given": "Koray",
+        "family": "Kavukcuoglu"
+      },
+      {
+        "given": "David",
+        "family": "Silver"
+      }
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          2015
+        ]
+      ]
+    },
+    "DOI": "10.1038/nature14236",
+    "container-title": "Nature",
+    "URL": ""
+  },
+  {
+    "id": "silver2016",
+    "type": "article-journal",
+    "title": "Mastering the game of Go with deep neural networks and tree search",
+    "author": [
+      {
+        "given": "David",
+        "family": "Silver"
+      },
+      {
+        "given": "Aja",
+        "family": "Huang"
+      },
+      {
+        "given": "Chris J.",
+        "family": "Maddison"
+      }
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          2016
+        ]
+      ]
+    },
+    "DOI": "10.1038/nature16961",
+    "container-title": "Nature",
+    "URL": ""
+  },
+  {
+    "id": "silver2017",
+    "type": "article-journal",
+    "title": "Mastering the game of Go without human knowledge",
+    "author": [
+      {
+        "given": "David",
+        "family": "Silver"
+      },
+      {
+        "given": "Julian",
+        "family": "Schrittwieser"
+      },
+      {
+        "given": "Karen",
+        "family": "Simonyan"
+      }
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          2017
+        ]
+      ]
+    },
+    "DOI": "10.1038/nature24270",
+    "container-title": "Nature",
+    "URL": ""
+  },
+  {
+    "id": "goodfellow2020",
+    "type": "article-journal",
+    "title": "Generative adversarial networks",
+    "author": [
+      {
+        "given": "Ian",
+        "family": "Goodfellow"
+      },
+      {
+        "given": "Jean",
+        "family": "Pouget-Abadie"
+      },
+      {
+        "given": "Mehdi",
+        "family": "Mirza"
+      }
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          2020
+        ]
+      ]
+    },
+    "DOI": "10.1145/3422622",
+    "container-title": "Communications of the ACM",
+    "URL": ""
+  },
+  {
+    "id": "hinton2012",
+    "type": "article-journal",
+    "title": "Deep neural networks for acoustic modeling in speech recognition",
+    "author": [
+      {
+        "given": "Geoffrey",
+        "family": "Hinton"
+      },
+      {
+        "given": "Li",
+        "family": "Deng"
+      },
+      {
+        "given": "Dong",
+        "family": "Yu"
+      }
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          2012
+        ]
+      ]
+    },
+    "DOI": "10.1109/MSP.2012.2205597",
+    "container-title": "IEEE Signal Processing Magazine",
+    "URL": ""
+  },
+  {
+    "id": "schmidhuber2015",
+    "type": "article-journal",
+    "title": "Deep learning in neural networks: An overview",
+    "author": [
+      {
+        "given": "Jurgen",
+        "family": "Schmidhuber"
+      }
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          2015
+        ]
+      ]
+    },
+    "DOI": "10.1016/j.neunet.2014.09.003",
+    "container-title": "Neural Networks",
+    "URL": ""
+  }
+]

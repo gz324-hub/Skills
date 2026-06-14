@@ -1,0 +1,205 @@
+{
+  "nodes": [
+    {
+      "id": "10.1145/3065386",
+      "label": "Krizhevsky 2017",
+      "title": "ImageNet classification with deep convolutional neural networks",
+      "authors": "Krizhevsky, Sutskever, Hinton",
+      "year": "2017",
+      "venue": "Communications of the ACM",
+      "doi": "10.1145/3065386",
+      "url": "https://doi.org/10.1145/3065386",
+      "cited_by": 7,
+      "value": 8
+    },
+    {
+      "id": "10.1038/nature14539",
+      "label": "LeCun 2015",
+      "title": "Deep learning",
+      "authors": "LeCun, Bengio, Hinton",
+      "year": "2015",
+      "venue": "Nature",
+      "doi": "10.1038/nature14539",
+      "url": "https://doi.org/10.1038/nature14539",
+      "cited_by": 0,
+      "value": 1
+    },
+    {
+      "id": "10.1109/cvpr.2016.90",
+      "label": "He 2016",
+      "title": "Deep residual learning for image recognition",
+      "authors": "He, Zhang, Ren, Sun",
+      "year": "2016",
+      "venue": "Proc. CVPR",
+      "doi": "10.1109/cvpr.2016.90",
+      "url": "https://doi.org/10.1109/cvpr.2016.90",
+      "cited_by": 1,
+      "value": 2
+    },
+    {
+      "id": "10.1109/cvpr.2015.7298594",
+      "label": "Szegedy 2015",
+      "title": "Going deeper with convolutions",
+      "authors": "Szegedy, Liu, Jia",
+      "year": "2015",
+      "venue": "Proc. CVPR",
+      "doi": "10.1109/cvpr.2015.7298594",
+      "url": "https://doi.org/10.1109/cvpr.2015.7298594",
+      "cited_by": 1,
+      "value": 2
+    },
+    {
+      "id": "10.1038/nature14236",
+      "label": "Mnih 2015",
+      "title": "Human-level control through deep reinforcement learning",
+      "authors": "Mnih, Kavukcuoglu, Silver",
+      "year": "2015",
+      "venue": "Nature",
+      "doi": "10.1038/nature14236",
+      "url": "https://doi.org/10.1038/nature14236",
+      "cited_by": 4,
+      "value": 5
+    },
+    {
+      "id": "10.1038/nature16961",
+      "label": "Silver 2016",
+      "title": "Mastering the game of Go with deep neural networks and tree search",
+      "authors": "Silver, Huang, Maddison",
+      "year": "2016",
+      "venue": "Nature",
+      "doi": "10.1038/nature16961",
+      "url": "https://doi.org/10.1038/nature16961",
+      "cited_by": 1,
+      "value": 2
+    },
+    {
+      "id": "10.1038/nature24270",
+      "label": "Silver 2017",
+      "title": "Mastering the game of Go without human knowledge",
+      "authors": "Silver, Schrittwieser, Simonyan",
+      "year": "2017",
+      "venue": "Nature",
+      "doi": "10.1038/nature24270",
+      "url": "https://doi.org/10.1038/nature24270",
+      "cited_by": 0,
+      "value": 1
+    },
+    {
+      "id": "10.1145/3422622",
+      "label": "Goodfellow 2020",
+      "title": "Generative adversarial networks",
+      "authors": "Goodfellow, Pouget-Abadie, Mirza",
+      "year": "2020",
+      "venue": "Communications of the ACM",
+      "doi": "10.1145/3422622",
+      "url": "https://doi.org/10.1145/3422622",
+      "cited_by": 0,
+      "value": 1
+    },
+    {
+      "id": "10.1109/msp.2012.2205597",
+      "label": "Hinton 2012",
+      "title": "Deep neural networks for acoustic modeling in speech recognition",
+      "authors": "Hinton, Deng, Yu",
+      "year": "2012",
+      "venue": "IEEE Signal Processing Magazine",
+      "doi": "10.1109/msp.2012.2205597",
+      "url": "https://doi.org/10.1109/msp.2012.2205597",
+      "cited_by": 4,
+      "value": 5
+    },
+    {
+      "id": "10.1016/j.neunet.2014.09.003",
+      "label": "Schmidhuber 2015",
+      "title": "Deep learning in neural networks: An overview",
+      "authors": "Schmidhuber",
+      "year": "2015",
+      "venue": "Neural Networks",
+      "doi": "10.1016/j.neunet.2014.09.003",
+      "url": "https://doi.org/10.1016/j.neunet.2014.09.003",
+      "cited_by": 0,
+      "value": 1
+    }
+  ],
+  "edges": [
+    {
+      "from": "10.1038/nature14539",
+      "to": "10.1145/3065386"
+    },
+    {
+      "from": "10.1038/nature14539",
+      "to": "10.1109/msp.2012.2205597"
+    },
+    {
+      "from": "10.1038/nature14539",
+      "to": "10.1038/nature14236"
+    },
+    {
+      "from": "10.1109/cvpr.2016.90",
+      "to": "10.1145/3065386"
+    },
+    {
+      "from": "10.1109/cvpr.2016.90",
+      "to": "10.1109/cvpr.2015.7298594"
+    },
+    {
+      "from": "10.1109/cvpr.2015.7298594",
+      "to": "10.1145/3065386"
+    },
+    {
+      "from": "10.1038/nature14236",
+      "to": "10.1145/3065386"
+    },
+    {
+      "from": "10.1038/nature14236",
+      "to": "10.1109/msp.2012.2205597"
+    },
+    {
+      "from": "10.1038/nature16961",
+      "to": "10.1038/nature14236"
+    },
+    {
+      "from": "10.1038/nature16961",
+      "to": "10.1145/3065386"
+    },
+    {
+      "from": "10.1038/nature24270",
+      "to": "10.1038/nature16961"
+    },
+    {
+      "from": "10.1038/nature24270",
+      "to": "10.1038/nature14236"
+    },
+    {
+      "from": "10.1038/nature24270",
+      "to": "10.1109/cvpr.2016.90"
+    },
+    {
+      "from": "10.1145/3422622",
+      "to": "10.1145/3065386"
+    },
+    {
+      "from": "10.1145/3422622",
+      "to": "10.1109/msp.2012.2205597"
+    },
+    {
+      "from": "10.1016/j.neunet.2014.09.003",
+      "to": "10.1145/3065386"
+    },
+    {
+      "from": "10.1016/j.neunet.2014.09.003",
+      "to": "10.1109/msp.2012.2205597"
+    },
+    {
+      "from": "10.1016/j.neunet.2014.09.003",
+      "to": "10.1038/nature14236"
+    }
+  ],
+  "generated": "2026-06-14 14:45 UTC",
+  "stats": {
+    "papers": 10,
+    "edges": 18,
+    "refs_resolved": 10,
+    "refs_unknown": 0
+  }
+}

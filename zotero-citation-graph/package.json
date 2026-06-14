@@ -1,0 +1,14 @@
+{
+  "name": "zotero-citation-graph",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Interactive citation graph from a Zotero export",
+  "scripts": {
+    "build": "python3 build_graph.py --input sample/library.json --out out",
+    "shot": "node .claude/skills/run-zotero-citation-graph/driver.mjs verify"
+  },
+  "devDependencies": {
+    "playwright": "^1.56.1"
+  }
+}

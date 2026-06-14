@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zotero Citation Graph</title>
+<script src="vendor/vis-network.min.js"></script>
+<script src="out/graph-data.js"></script>
+<style>
+  :root { --bg:#0d1117; --panel:#161b22; --line:#30363d; --ink:#e6edf3; --muted:#8b949e; --accent:#58a6ff; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--ink);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  #app { display:flex; flex-direction:column; height:100vh; }
+  header { padding:10px 16px; border-bottom:1px solid var(--line); background:var(--panel);
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+  header h1 { font-size:16px; margin:0; font-weight:650; }
+  header .stats { color:var(--muted); font-size:13px; }
+  header .hint { color:var(--accent); font-size:13px; margin-left:auto; }
+  #search { background:#0d1117; border:1px solid var(--line); color:var(--ink);
+    border-radius:6px; padding:6px 10px; font-size:13px; width:240px; }
+  #net { flex:1; min-height:0; }
+  .legend { position:absolute; left:16px; bottom:16px; background:rgba(22,27,34,.9);
+    border:1px solid var(--line); border-radius:8px; padding:10px 12px; font-size:12px; color:var(--muted); }
+  .legend b { color:var(--ink); }
+  .swatch { display:inline-block; width:11px; height:11px; border-radius:50%; margin-right:6px; vertical-align:-1px; }
+  #empty { margin:auto; max-width:560px; padding:40px; text-align:center; color:var(--muted); }
+  code { background:#0d1117; border:1px solid var(--line); border-radius:4px; padding:1px 5px; color:var(--ink); }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>📚 Zotero Citation Graph</h1>
+    <span class="stats" id="stats"></span>
+    <input id="search" type="search" placeholder="Filter papers by title / author…" autocomplete="off">
+    <span class="hint">Click a node → open the paper · drag to rearrange · scroll to zoom</span>
+  </header>
+  <div id="net"></div>
+  <div class="legend" id="legend">
+    <div><b>Node size</b> = times cited within your library</div>
+    <div><span class="swatch" style="background:#f85149"></span>highly cited (hub)
+         &nbsp;<span class="swatch" style="background:#58a6ff"></span>less cited</div>
+    <div style="margin-top:4px">Arrow <b>A → B</b> = paper A cites paper B</div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const G = window.GRAPH;
+  const host = document.getElementById("net");
+  if (!G || !G.nodes || !G.nodes.length) {
+    host.innerHTML =
+      '<div id="empty"><h2>No graph data</h2><p>Run the pipeline first:</p>' +
+      '<p><code>python3 build_graph.py --input sample/library.json --out out</code></p>' +
+      '<p>then reload this page.</p></div>';
+    return;
+  }
+
+  document.getElementById("stats").textContent =
+    G.stats.papers + " papers · " + G.stats.edges + " citation links · built " + G.generated;
+
+  // color scale: more in-library citations -> warmer (blue -> red)
+  const maxCited = Math.max(1, ...G.nodes.map(n => n.cited_by || 0));
+  function colorFor(c) {
+    const t = (c || 0) / maxCited;                 // 0..1
+    const hue = 210 - 210 * t;                      // 210 (blue) -> 0 (red)
+    const light = 62 - 10 * t;
+    return "hsl(" + hue.toFixed(0) + ",70%," + light.toFixed(0) + "%)";
+  }
+
+  const nodes = new vis.DataSet(G.nodes.map(n => ({
+    id: n.id,
+    label: n.label,
+    value: n.value || 1,
+    url: n.url,
+    title: tooltip(n),                              // hover card
+    color: { background: colorFor(n.cited_by),
+             border: "#0d1117",
+             highlight: { background: colorFor(n.cited_by), border: "#e6edf3" } },
+    font: { color: "#e6edf3", size: 14, strokeWidth: 3, strokeColor: "#0d1117" },
+  })));
+  const edges = new vis.DataSet(G.edges.map(e => ({
+    from: e.from, to: e.to, arrows: "to",
+  })));
+
+  function tooltip(n) {
+    const el = document.createElement("div");
+    el.style.maxWidth = "320px";
+    el.style.font = "13px system-ui, sans-serif";
+    el.innerHTML =
+      "<b>" + esc(n.title) + "</b><br>" +
+      "<span style='color:#8b949e'>" + esc(n.authors || "") +
+      (n.year ? " · " + esc(n.year) : "") + "</span>" +
+      (n.venue ? "<br><i style='color:#8b949e'>" + esc(n.venue) + "</i>" : "") +
+      "<br>cited by " + (n.cited_by || 0) + " paper(s) in your library" +
+      "<br><span style='color:#58a6ff'>click to open ↗</span>";
+    return el;
+  }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>]/g,
+    c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c])); }
+
+  const network = new vis.Network(host, { nodes, edges }, {
+    nodes: { shape: "dot", scaling: { min: 10, max: 46,
+      label: { enabled: true, min: 12, max: 22 } } },
+    edges: { color: { color: "#5b6573", highlight: "#e6edf3", opacity: 0.8 },
+      width: 1.2, smooth: { type: "continuous" },
+      arrows: { to: { scaleFactor: 0.6 } } },
+    physics: { barnesHut: { gravitationalConstant: -12000, centralGravity: 0.25,
+      springLength: 170, springConstant: 0.04, damping: 0.6, avoidOverlap: 1 },
+      stabilization: { iterations: 300 } },
+    interaction: { hover: true, tooltipDelay: 90, navigationButtons: false,
+      keyboard: false },
+  });
+
+  // CLICK A NODE -> OPEN THE PAPER WEBSITE
+  network.on("click", function (params) {
+    if (params.nodes && params.nodes.length) {
+      const n = nodes.get(params.nodes[0]);
+      if (n && n.url) window.open(n.url, "_blank", "noopener");
+    }
+  });
+  network.on("hoverNode", () => host.style.cursor = "pointer");
+  network.on("blurNode", () => host.style.cursor = "default");
+
+  // search / filter: dim non-matching nodes
+  const base = G.nodes.reduce((m, n) => (m[n.id] = n, m), {});
+  document.getElementById("search").addEventListener("input", function (e) {
+    const q = e.target.value.trim().toLowerCase();
+    nodes.update(G.nodes.map(n => {
+      const hit = !q || (n.title + " " + n.authors + " " + n.label).toLowerCase().includes(q);
+      return { id: n.id, opacity: hit ? 1 : 0.12,
+               color: { background: colorFor(base[n.id].cited_by), border: "#0d1117" } };
+    }));
+  });
+
+  // expose for the headless driver to assert on
+  window.__graph = { network, nodes, edges, positionsReady: false };
+  network.once("stabilizationIterationsDone", () => {
+    network.fit();
+    window.__graph.positionsReady = true;
+    document.body.setAttribute("data-stable", "1");
+  });
+})();
+</script>
+</body>
+</html>
