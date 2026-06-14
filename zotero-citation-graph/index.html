@@ -111,8 +111,9 @@
   const network = new vis.Network(host, { nodes, edges }, {
     nodes: { shape: "dot", borderWidth: 1.5,
       scaling: { min: 12, max: 52, label: { enabled: true, min: 18, max: 38 } } },
-    edges: { color: { color: "#c2cad6", highlight: "#6b7686", opacity: 0.9 },
-      width: 1.3, smooth: { type: "continuous" }, arrows: { to: { scaleFactor: 0.6 } } },
+    edges: { color: { color: "#000000", highlight: "#000000", inherit: false, opacity: 1 },
+      width: 2.6, selectionWidth: 1.4, smooth: { type: "continuous" },
+      arrows: { to: { enabled: true, scaleFactor: 1.1 } } },
     physics: { barnesHut: { gravitationalConstant: -12000, centralGravity: 0.25,
       springLength: 170, springConstant: 0.04, damping: 0.6, avoidOverlap: 1 },
       stabilization: { iterations: 300 } },
