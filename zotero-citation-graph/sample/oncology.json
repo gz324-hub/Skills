@@ -1,0 +1,266 @@
+[
+  {
+    "id": "olaparib_trial",
+    "type": "article-journal",
+    "title": "Olaparib maintenance therapy in platinum-sensitive ovarian cancer: a randomized, double-blind, phase III trial",
+    "abstract": "A randomized double-blind phase III clinical trial evaluating efficacy and safety of olaparib maintenance.",
+    "author": [
+      {
+        "given": "M.",
+        "family": "Ledermann"
+      }
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          2019
+        ]
+      ]
+    },
+    "DOI": "10.1000/onc.0001",
+    "container-title": "J. Clin. Oncol.",
+    "URL": ""
+  },
+  {
+    "id": "parp_hrd",
+    "type": "article-journal",
+    "title": "PARP inhibition exploits homologous recombination deficiency and replication stress in BRCA-mutant tumors",
+    "abstract": "PARP inhibitors induce synthetic lethality through unrepaired DNA damage in homologous recombination deficient cells.",
+    "author": [
+      {
+        "given": "H.",
+        "family": "Farmer"
+      }
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          2017
+        ]
+      ]
+    },
+    "DOI": "10.1000/onc.0002",
+    "container-title": "Nat. Rev. Cancer",
+    "URL": ""
+  },
+  {
+    "id": "net_method",
+    "type": "article-journal",
+    "title": "An open-source computational framework and algorithm for network analysis of signaling pathways",
+    "abstract": "We present a scalable computational framework and algorithm implemented as open-source software for pathway network analysis.",
+    "author": [
+      {
+        "given": "J.",
+        "family": "Chen"
+      }
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          2020
+        ]
+      ]
+    },
+    "DOI": "10.1000/onc.0003",
+    "container-title": "Bioinformatics",
+    "URL": ""
+  },
+  {
+    "id": "caf_tme",
+    "type": "article-journal",
+    "title": "Cancer-associated fibroblasts shape the tumor microenvironment and promote immune evasion",
+    "abstract": "Cancer-associated fibroblasts remodel the stroma and extracellular matrix of the tumor microenvironment.",
+    "author": [
+      {
+        "given": "E.",
+        "family": "Sahai"
+      }
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          2018
+        ]
+      ]
+    },
+    "DOI": "10.1000/onc.0004",
+    "container-title": "Nat. Rev. Cancer",
+    "URL": ""
+  },
+  {
+    "id": "pd1_immuno",
+    "type": "article-journal",
+    "title": "PD-1 checkpoint blockade enhances T cell-mediated antitumor immunity",
+    "abstract": "Immune checkpoint blockade targeting PD-1 restores T cell antitumor immunity and durable responses.",
+    "author": [
+      {
+        "given": "S.",
+        "family": "Topalian"
+      }
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          2016
+        ]
+      ]
+    },
+    "DOI": "10.1000/onc.0005",
+    "container-title": "Cell",
+    "URL": ""
+  },
+  {
+    "id": "scrna_genomics",
+    "type": "article-journal",
+    "title": "Single-cell RNA sequencing reveals transcriptomic heterogeneity across tumor genomes",
+    "abstract": "Single-cell RNA sequencing exposes genomic and transcriptomic heterogeneity and somatic mutation patterns.",
+    "author": [
+      {
+        "given": "A.",
+        "family": "Tirosh"
+      }
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          2019
+        ]
+      ]
+    },
+    "DOI": "10.1000/onc.0006",
+    "container-title": "Science",
+    "URL": ""
+  },
+  {
+    "id": "hallmarks_review",
+    "type": "article-journal",
+    "title": "The hallmarks of cancer: a review of emerging therapeutic perspectives",
+    "abstract": "A comprehensive review and perspective on the hallmarks of cancer and emerging therapies.",
+    "author": [
+      {
+        "given": "D.",
+        "family": "Hanahan"
+      }
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          2022
+        ]
+      ]
+    },
+    "DOI": "10.1000/onc.0007",
+    "container-title": "Cancer Discov.",
+    "URL": ""
+  },
+  {
+    "id": "pembro_trial",
+    "type": "article-journal",
+    "title": "Pembrolizumab versus chemotherapy in advanced melanoma: a randomized phase III clinical trial",
+    "abstract": "A randomized phase III clinical trial comparing pembrolizumab with chemotherapy for efficacy and safety.",
+    "author": [
+      {
+        "given": "C.",
+        "family": "Robert"
+      }
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          2015
+        ]
+      ]
+    },
+    "DOI": "10.1000/onc.0008",
+    "container-title": "N. Engl. J. Med.",
+    "URL": ""
+  },
+  {
+    "id": "atm_atr_ddr",
+    "type": "article-journal",
+    "title": "ATM and ATR kinase signaling coordinate the DNA damage response to double-strand breaks",
+    "abstract": "ATM and ATR kinase signaling orchestrate the DNA damage response and repair of double-strand breaks.",
+    "author": [
+      {
+        "given": "S.",
+        "family": "Jackson"
+      }
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          2017
+        ]
+      ]
+    },
+    "DOI": "10.1000/onc.0009",
+    "container-title": "Mol. Cell",
+    "URL": ""
+  },
+  {
+    "id": "hypoxia_tme",
+    "type": "article-journal",
+    "title": "Hypoxia and angiogenesis in the tumor microenvironment drive metastatic progression",
+    "abstract": "Hypoxia drives angiogenesis within the tumor microenvironment, promoting metastasis and niche remodeling.",
+    "author": [
+      {
+        "given": "P.",
+        "family": "Carmeliet"
+      }
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          2018
+        ]
+      ]
+    },
+    "DOI": "10.1000/onc.0010",
+    "container-title": "Nat. Rev. Cancer",
+    "URL": ""
+  },
+  {
+    "id": "graph_method",
+    "type": "article-journal",
+    "title": "A scalable algorithm and software toolkit for graph-based analysis of biological networks",
+    "abstract": "An efficient algorithm and software toolkit enabling benchmark graph-based analysis of large biological networks.",
+    "author": [
+      {
+        "given": "R.",
+        "family": "Kumar"
+      }
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          2021
+        ]
+      ]
+    },
+    "DOI": "10.1000/onc.0011",
+    "container-title": "Bioinformatics",
+    "URL": ""
+  },
+  {
+    "id": "wgs_genomics",
+    "type": "article-journal",
+    "title": "Whole-genome sequencing identifies driver mutations and variant signatures across cancers",
+    "abstract": "Whole-genome sequencing reveals recurrent driver mutations and variant signatures, with multi-omics integration.",
+    "author": [
+      {
+        "given": "M.",
+        "family": "Stratton"
+      }
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          2020
+        ]
+      ]
+    },
+    "DOI": "10.1000/onc.0012",
+    "container-title": "Nature",
+    "URL": ""
+  }
+]

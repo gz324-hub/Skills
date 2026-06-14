@@ -7,7 +7,8 @@
 <script src="vendor/vis-network.min.js"></script>
 <script src="out/graph-data.js"></script>
 <style>
-  :root { --bg:#0d1117; --panel:#161b22; --line:#30363d; --ink:#e6edf3; --muted:#8b949e; --accent:#58a6ff; }
+  :root { --bg:#ffffff; --panel:#f4f6f9; --line:#d7dde5; --ink:#1b2330;
+          --muted:#5b6675; --accent:#1f6feb; }
   * { box-sizing: border-box; }
   html, body { margin:0; height:100%; background:var(--bg); color:var(--ink);
     font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
@@ -17,15 +18,24 @@
   header h1 { font-size:16px; margin:0; font-weight:650; }
   header .stats { color:var(--muted); font-size:13px; }
   header .hint { color:var(--accent); font-size:13px; margin-left:auto; }
-  #search { background:#0d1117; border:1px solid var(--line); color:var(--ink);
+  #search { background:#fff; border:1px solid var(--line); color:var(--ink);
     border-radius:6px; padding:6px 10px; font-size:13px; width:240px; }
-  #net { flex:1; min-height:0; }
-  .legend { position:absolute; left:16px; bottom:16px; background:rgba(22,27,34,.9);
-    border:1px solid var(--line); border-radius:8px; padding:10px 12px; font-size:12px; color:var(--muted); }
-  .legend b { color:var(--ink); }
-  .swatch { display:inline-block; width:11px; height:11px; border-radius:50%; margin-right:6px; vertical-align:-1px; }
+  #net { flex:1; min-height:0; background:#ffffff; }
+  .legend { position:absolute; left:16px; bottom:16px; background:rgba(255,255,255,.94);
+    border:1px solid var(--line); border-radius:10px; padding:10px 12px; font-size:12.5px;
+    color:var(--ink); box-shadow:0 2px 10px rgba(20,30,50,.08); max-width:240px; }
+  .legend .t { font-weight:650; margin-bottom:6px; }
+  .legend .row { display:flex; align-items:center; gap:8px; padding:3px 4px; border-radius:6px;
+    cursor:pointer; }
+  .legend .row:hover { background:#eef2f7; }
+  .legend .row.off { opacity:.38; }
+  .legend .swatch { width:13px; height:13px; border-radius:50%; flex:0 0 auto;
+    border:1px solid rgba(0,0,0,.25); }
+  .legend .count { color:var(--muted); margin-left:auto; }
+  .legend .note { color:var(--muted); margin-top:8px; font-size:11.5px; line-height:1.5; }
   #empty { margin:auto; max-width:560px; padding:40px; text-align:center; color:var(--muted); }
-  code { background:#0d1117; border:1px solid var(--line); border-radius:4px; padding:1px 5px; color:var(--ink); }
+  code { background:#eef2f7; border:1px solid var(--line); border-radius:4px; padding:1px 5px;
+    color:var(--ink); }
 </style>
 </head>
 <body>
@@ -34,15 +44,10 @@
     <h1>📚 Zotero Citation Graph</h1>
     <span class="stats" id="stats"></span>
     <input id="search" type="search" placeholder="Filter papers by title / author…" autocomplete="off">
-    <span class="hint">Click a node → open the paper · drag to rearrange · scroll to zoom</span>
+    <span class="hint">Click a node → open the paper · click legend → filter by genre</span>
   </header>
   <div id="net"></div>
-  <div class="legend" id="legend">
-    <div><b>Node size</b> = times cited within your library</div>
-    <div><span class="swatch" style="background:#f85149"></span>highly cited (hub)
-         &nbsp;<span class="swatch" style="background:#58a6ff"></span>less cited</div>
-    <div style="margin-top:4px">Arrow <b>A → B</b> = paper A cites paper B</div>
-  </div>
+  <div class="legend" id="legend"></div>
 </div>
 
 <script>
@@ -51,8 +56,8 @@
   const host = document.getElementById("net");
   if (!G || !G.nodes || !G.nodes.length) {
     host.innerHTML =
-      '<div id="empty"><h2>No graph data</h2><p>Run the pipeline first:</p>' +
-      '<p><code>python3 build_graph.py --input sample/library.json --out out</code></p>' +
+      '<div id="empty"><h2>No graph data</h2><p>Build it first:</p>' +
+      '<p><code>python3 build_graph.py --input sample/oncology.json --out out</code></p>' +
       '<p>then reload this page.</p></div>';
     return;
   }
@@ -60,57 +65,48 @@
   document.getElementById("stats").textContent =
     G.stats.papers + " papers · " + G.stats.edges + " citation links · built " + G.generated;
 
-  // color scale: more in-library citations -> warmer (blue -> red)
-  const maxCited = Math.max(1, ...G.nodes.map(n => n.cited_by || 0));
-  function colorFor(c) {
-    const t = (c || 0) / maxCited;                 // 0..1
-    const hue = 210 - 210 * t;                      // 210 (blue) -> 0 (red)
-    const light = 62 - 10 * t;
-    return "hsl(" + hue.toFixed(0) + ",70%," + light.toFixed(0) + "%)";
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>]/g,
+    c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c])); }
+  function darken(hex, f) {
+    const m = /^#?([0-9a-f]{6})$/i.exec(hex || "#8d99ae");
+    const n = m ? parseInt(m[1], 16) : 0x8d99ae;
+    const r = Math.round(((n >> 16) & 255) * f),
+          g = Math.round(((n >> 8) & 255) * f),
+          b = Math.round((n & 255) * f);
+    return "rgb(" + r + "," + g + "," + b + ")";
+  }
+  function tooltip(n) {
+    const el = document.createElement("div");
+    el.style.maxWidth = "320px"; el.style.font = "13px system-ui, sans-serif";
+    el.innerHTML =
+      "<b>" + esc(n.title) + "</b><br>" +
+      "<span style='color:#5b6675'>" + esc(n.authors || "") +
+      (n.year ? " · " + esc(n.year) : "") + "</span>" +
+      (n.venue ? "<br><i style='color:#5b6675'>" + esc(n.venue) + "</i>" : "") +
+      "<br><b style='color:" + darken(n.color, 0.8) + "'>" + esc(n.genre) + "</b>" +
+      " · cited by " + (n.cited_by || 0) + " in your library" +
+      "<br><span style='color:#1f6feb'>click to open ↗</span>";
+    return el;
   }
 
   const nodes = new vis.DataSet(G.nodes.map(n => ({
-    id: n.id,
-    label: n.label,
-    value: n.value || 1,
-    url: n.url,
-    title: tooltip(n),                              // hover card
-    color: { background: colorFor(n.cited_by),
-             border: "#0d1117",
-             highlight: { background: colorFor(n.cited_by), border: "#e6edf3" } },
-    font: { color: "#e6edf3", size: 14, strokeWidth: 3, strokeColor: "#0d1117" },
+    id: n.id, label: n.label, value: n.value || 1, url: n.url, genre: n.genre,
+    title: tooltip(n),
+    color: { background: n.color, border: darken(n.color, 0.65),
+             highlight: { background: n.color, border: "#1b2330" } },
+    font: { color: "#1b2330", size: 14, strokeWidth: 4, strokeColor: "#ffffff" },
   })));
-  const edges = new vis.DataSet(G.edges.map(e => ({
-    from: e.from, to: e.to, arrows: "to",
-  })));
-
-  function tooltip(n) {
-    const el = document.createElement("div");
-    el.style.maxWidth = "320px";
-    el.style.font = "13px system-ui, sans-serif";
-    el.innerHTML =
-      "<b>" + esc(n.title) + "</b><br>" +
-      "<span style='color:#8b949e'>" + esc(n.authors || "") +
-      (n.year ? " · " + esc(n.year) : "") + "</span>" +
-      (n.venue ? "<br><i style='color:#8b949e'>" + esc(n.venue) + "</i>" : "") +
-      "<br>cited by " + (n.cited_by || 0) + " paper(s) in your library" +
-      "<br><span style='color:#58a6ff'>click to open ↗</span>";
-    return el;
-  }
-  function esc(s) { return String(s == null ? "" : s).replace(/[&<>]/g,
-    c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c])); }
+  const edges = new vis.DataSet(G.edges.map(e => ({ from: e.from, to: e.to, arrows: "to" })));
 
   const network = new vis.Network(host, { nodes, edges }, {
-    nodes: { shape: "dot", scaling: { min: 10, max: 46,
-      label: { enabled: true, min: 12, max: 22 } } },
-    edges: { color: { color: "#5b6573", highlight: "#e6edf3", opacity: 0.8 },
-      width: 1.2, smooth: { type: "continuous" },
-      arrows: { to: { scaleFactor: 0.6 } } },
+    nodes: { shape: "dot", borderWidth: 1.5,
+      scaling: { min: 10, max: 48, label: { enabled: true, min: 12, max: 24 } } },
+    edges: { color: { color: "#c2cad6", highlight: "#6b7686", opacity: 0.9 },
+      width: 1.3, smooth: { type: "continuous" }, arrows: { to: { scaleFactor: 0.6 } } },
     physics: { barnesHut: { gravitationalConstant: -12000, centralGravity: 0.25,
       springLength: 170, springConstant: 0.04, damping: 0.6, avoidOverlap: 1 },
       stabilization: { iterations: 300 } },
-    interaction: { hover: true, tooltipDelay: 90, navigationButtons: false,
-      keyboard: false },
+    interaction: { hover: true, tooltipDelay: 90, keyboard: false },
   });
 
   // CLICK A NODE -> OPEN THE PAPER WEBSITE
@@ -123,22 +119,53 @@
   network.on("hoverNode", () => host.style.cursor = "pointer");
   network.on("blurNode", () => host.style.cursor = "default");
 
-  // search / filter: dim non-matching nodes
-  const base = G.nodes.reduce((m, n) => (m[n.id] = n, m), {});
-  document.getElementById("search").addEventListener("input", function (e) {
-    const q = e.target.value.trim().toLowerCase();
+  // ---- legend (genre colour key) + filtering --------------------------------
+  let activeGenre = null;            // null = show all
+  let searchText = "";
+  const byId = G.nodes.reduce((m, n) => (m[n.id] = n, m), {});
+  function applyFilter() {
     nodes.update(G.nodes.map(n => {
-      const hit = !q || (n.title + " " + n.authors + " " + n.label).toLowerCase().includes(q);
-      return { id: n.id, opacity: hit ? 1 : 0.12,
-               color: { background: colorFor(base[n.id].cited_by), border: "#0d1117" } };
+      const okGenre = !activeGenre || n.genre === activeGenre;
+      const okText = !searchText ||
+        (n.title + " " + n.authors + " " + n.label).toLowerCase().includes(searchText);
+      const on = okGenre && okText;
+      return { id: n.id, opacity: on ? 1 : 0.1,
+        color: { background: byId[n.id].color, border: darken(byId[n.id].color, 0.65) } };
     }));
+  }
+
+  const legend = document.getElementById("legend");
+  let html = '<div class="t" id="legtitle">Research genre</div>';
+  G.genres.forEach(g => {
+    html += '<div class="row" data-g="' + esc(g.name) + '">' +
+      '<span class="swatch" style="background:' + g.color + '"></span>' +
+      '<span>' + esc(g.name) + '</span><span class="count">' + g.count + '</span></div>';
+  });
+  html += '<div class="note"><b>size</b> = times cited within your library' +
+          '<br><b>arrow A→B</b> = paper A cites paper B</div>';
+  legend.innerHTML = html;
+  legend.querySelectorAll(".row").forEach(row => {
+    row.addEventListener("click", () => {
+      const g = row.getAttribute("data-g");
+      activeGenre = (activeGenre === g) ? null : g;     // toggle
+      legend.querySelectorAll(".row").forEach(r =>
+        r.classList.toggle("off", activeGenre && r.getAttribute("data-g") !== activeGenre));
+      applyFilter();
+    });
+  });
+  document.getElementById("legtitle").addEventListener("click", () => {
+    activeGenre = null;
+    legend.querySelectorAll(".row").forEach(r => r.classList.remove("off"));
+    applyFilter();
+  });
+  document.getElementById("search").addEventListener("input", e => {
+    searchText = e.target.value.trim().toLowerCase(); applyFilter();
   });
 
-  // expose for the headless driver to assert on
-  window.__graph = { network, nodes, edges, positionsReady: false };
+  // expose for the headless driver
+  window.__graph = { network, nodes, edges };
   network.once("stabilizationIterationsDone", () => {
     network.fit();
-    window.__graph.positionsReady = true;
     document.body.setAttribute("data-stable", "1");
   });
 })();

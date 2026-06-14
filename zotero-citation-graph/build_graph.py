@@ -7,8 +7,13 @@ Pipeline:  Zotero export  ->  nodes (papers) + directed edges (A cites B)  ->
            out/graph.json     (portable copy of the same data)
 
 A node is a paper. A directed edge A -> B means "paper A cites paper B"
-(arrow points from the citing paper to the cited paper). Clicking a node in
-the viewer opens that paper's website (DOI / URL).
+(arrow points from the citing paper to the cited paper).
+
+  * node SIZE   = how many papers in your library cite it (impact within your set)
+  * node COLOUR = research genre (Clinical trial / DDR / TME / ... ), assigned by
+                  the editable rules in genres.json (mutually exclusive +
+                  collectively exhaustive, "Other" is the catch-all).
+  * click a node -> opens that paper's website (DOI / URL)
 
 Citation edges are NOT present in a vanilla Zotero export, so they are
 enriched from CrossRef reference lists, keyed by DOI. Responses are cached
@@ -18,8 +23,8 @@ the graph can be rebuilt fully offline from the cache.
 Stdlib only. Online enrichment uses urllib (no third-party deps required).
 
 Usage:
-    python3 build_graph.py --input sample/library.json --out out
-    python3 build_graph.py --input sample/library.json --out out --online \
+    python3 build_graph.py --input sample/oncology.json --out out
+    python3 build_graph.py --input "My Library.json" --out out --online \
         --mailto you@example.com
 """
 import argparse
@@ -56,14 +61,12 @@ def detect_format(path, explicit):
         return "csljson"
     if path.lower().endswith((".bib", ".bibtex")):
         return "bibtex"
-    # sniff
     with open(path, "r", encoding="utf-8", errors="replace") as fh:
         head = fh.read(2048).lstrip()
     return "csljson" if head.startswith(("[", "{")) else "bibtex"
 
 
 def _people(authors):
-    """CSL author list -> 'Lastname, Lastname2'."""
     out = []
     for a in authors or []:
         fam = a.get("family") or a.get("literal") or ""
@@ -72,10 +75,18 @@ def _people(authors):
     return out
 
 
+def _csl_keywords(it):
+    """CSL 'keyword' can be a comma string or a list; also accept 'categories'."""
+    kw = it.get("keyword") or it.get("keywords") or it.get("categories") or ""
+    if isinstance(kw, list):
+        return [str(k).strip() for k in kw if str(k).strip()]
+    return [k.strip() for k in re.split(r"[;,]", str(kw)) if k.strip()]
+
+
 def parse_csljson(path):
     with open(path, "r", encoding="utf-8", errors="replace") as fh:
         data = json.load(fh)
-    if isinstance(data, dict):  # some exporters wrap in {"items":[...]}
+    if isinstance(data, dict):
         data = data.get("items", data.get("references", []))
     items = []
     for it in data:
@@ -95,6 +106,8 @@ def parse_csljson(path):
             "url": (it.get("URL") or "").strip(),
             "type": it.get("type") or "",
             "venue": (it.get("container-title") or it.get("publisher") or "").strip(),
+            "abstract": (it.get("abstract") or "").strip(),
+            "keywords": _csl_keywords(it),
         })
     return items
 
@@ -121,6 +134,9 @@ def parse_bibtex(path):
             "url": fields.get("url", ""),
             "type": etype.lower(),
             "venue": fields.get("journal") or fields.get("booktitle") or "",
+            "abstract": fields.get("abstract", ""),
+            "keywords": [k.strip() for k in re.split(r"[;,]", fields.get("keywords", ""))
+                         if k.strip()],
         })
     return items
 
@@ -128,7 +144,6 @@ def parse_bibtex(path):
 def load_items(path, fmt):
     fmt = detect_format(path, fmt)
     items = parse_csljson(path) if fmt == "csljson" else parse_bibtex(path)
-    # stable id: DOI if present, else slug of title
     seen = {}
     for it in items:
         base = it["doi"] or _slug(it["title"])
@@ -142,6 +157,50 @@ def load_items(path, fmt):
     return items, fmt
 
 
+# ------------------------------ genres ------------------------------------
+
+DEFAULT_GENRES = [
+    {"name": "Method", "color": "#17a2b8",
+     "match": ["algorithm", "framework", "pipeline", "computational", "software",
+               "machine learning", "deep learning", "neural network"]},
+    {"name": "Review", "color": "#d6336c",
+     "match": ["review", "meta-analysis", "overview", "perspective", "survey"]},
+    {"name": "Other", "color": "#8d99ae", "match": []},
+]
+
+
+def load_genres(path):
+    if path and os.path.exists(path):
+        with open(path, "r", encoding="utf-8") as fh:
+            cfg = json.load(fh)
+        genres = cfg.get("genres", cfg) if isinstance(cfg, dict) else cfg
+    else:
+        genres = DEFAULT_GENRES
+    # guarantee a catch-all so classification is collectively exhaustive
+    if not any((g.get("match") or []) == [] or g["name"].lower() == "other"
+               for g in genres):
+        genres = genres + [{"name": "Other", "color": "#8d99ae", "match": []}]
+    return genres
+
+
+def classify(item, genres):
+    """Assign exactly one genre (first matching rule wins; 'Other' catches rest)."""
+    blob = " ".join([
+        item.get("title", ""), item.get("venue", ""), item.get("abstract", ""),
+        " ".join(item.get("keywords", [])),
+    ]).lower()
+    tags = {k.lower() for k in item.get("keywords", [])}
+    # explicit override: a tag that exactly names a genre wins
+    for g in genres:
+        if g["name"].lower() in tags:
+            return g
+    for g in genres:
+        for kw in (g.get("match") or []):
+            if kw.lower() in blob:
+                return g
+    return genres[-1]  # 'Other'
+
+
 # --------------------------- citation enrichment --------------------------
 
 def _cache_path(cache_dir, doi):
@@ -149,7 +208,6 @@ def _cache_path(cache_dir, doi):
 
 
 def crossref_references(doi, cache_dir, online, mailto, sleep=1.0):
-    """Return list of cited DOIs for `doi`, using cache first."""
     cp = _cache_path(cache_dir, doi)
     payload = None
     if os.path.exists(cp):
@@ -168,24 +226,19 @@ def crossref_references(doi, cache_dir, online, mailto, sleep=1.0):
             os.makedirs(os.path.dirname(cp), exist_ok=True)
             with open(cp, "w", encoding="utf-8") as fh:
                 json.dump(payload, fh)
-            time.sleep(sleep)  # be polite to the public API
+            time.sleep(sleep)
         except Exception as exc:
             sys.stderr.write("  ! CrossRef fetch failed for %s: %s\n" % (doi, exc))
             payload = None
     if not payload:
-        return None  # unknown (no cache, offline or fetch failed)
+        return None
     refs = (payload.get("message", {}) or {}).get("reference", []) or []
-    out = []
-    for r in refs:
-        d = _norm_doi(r.get("DOI"))
-        if d:
-            out.append(d)
-    return out
+    return [_norm_doi(r.get("DOI")) for r in refs if _norm_doi(r.get("DOI"))]
 
 
 # ------------------------------- graph build ------------------------------
 
-def build(items, cache_dir, online, mailto):
+def build(items, genres, cache_dir, online, mailto):
     by_doi = {it["doi"]: it["id"] for it in items if it["doi"]}
     edges, seen_edge = [], set()
     resolved, unknown = 0, 0
@@ -210,34 +263,42 @@ def build(items, cache_dir, online, mailto):
     for e in edges:
         indeg[e["to"]] = indeg.get(e["to"], 0) + 1
 
+    genre_count = {}
     nodes = []
     for it in items:
         cited_by = indeg.get(it["id"], 0)
         first = it["authors"][0] if it["authors"] else "?"
-        label = "%s %s" % (first, it["year"] or "")
-        # click target: DOI page, else stored URL, else Scholar search
+        label = ("%s %s" % (first, it["year"] or "")).strip()
         if it["doi"]:
             link = "https://doi.org/" + it["doi"]
         elif it["url"]:
             link = it["url"]
         else:
             link = "https://scholar.google.com/scholar?q=" + urllib.parse.quote(it["title"])
+        g = classify(it, genres)
+        genre_count[g["name"]] = genre_count.get(g["name"], 0) + 1
         nodes.append({
             "id": it["id"],
-            "label": label.strip(),
+            "label": label,
             "title": it["title"],
             "authors": ", ".join(it["authors"]),
             "year": it["year"],
             "venue": it["venue"],
             "doi": it["doi"],
             "url": link,
+            "genre": g["name"],
+            "color": g["color"],
             "cited_by": cited_by,
             "value": 1 + cited_by,  # node size scales with in-library citations
         })
 
+    legend = [{"name": g["name"], "color": g["color"], "count": genre_count[g["name"]]}
+              for g in genres if genre_count.get(g["name"])]
+
     return {
         "nodes": nodes,
         "edges": edges,
+        "genres": legend,
         "generated": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
         "stats": {
             "papers": len(nodes),
@@ -254,7 +315,6 @@ def write_outputs(graph, out_dir):
     os.makedirs(out_dir, exist_ok=True)
     with open(os.path.join(out_dir, "graph.json"), "w", encoding="utf-8") as fh:
         json.dump(graph, fh, indent=2, ensure_ascii=False)
-    # JS form lets index.html load over file:// with no server / no CORS
     with open(os.path.join(out_dir, "graph-data.js"), "w", encoding="utf-8") as fh:
         fh.write("window.GRAPH = ")
         json.dump(graph, fh, ensure_ascii=False)
@@ -262,10 +322,13 @@ def write_outputs(graph, out_dir):
 
 
 def main(argv=None):
+    here = os.path.dirname(os.path.abspath(__file__))
     ap = argparse.ArgumentParser(description="Zotero export -> citation graph")
     ap.add_argument("--input", required=True, help="Zotero export (CSL-JSON or BibTeX)")
     ap.add_argument("--out", default="out", help="output dir (default: out)")
     ap.add_argument("--cache", default="cache", help="citation cache dir (default: cache)")
+    ap.add_argument("--genres", default=os.path.join(here, "genres.json"),
+                    help="genre colour rules (default: genres.json next to this script)")
     ap.add_argument("--format", default="auto", choices=["auto", "csljson", "bibtex"])
     ap.add_argument("--online", action="store_true",
                     help="fetch missing reference lists from CrossRef (else cache-only)")
@@ -273,13 +336,16 @@ def main(argv=None):
     args = ap.parse_args(argv)
 
     items, fmt = load_items(args.input, args.format)
+    genres = load_genres(args.genres)
     print("Loaded %d papers from %s (%s)" % (len(items), args.input, fmt))
-    graph = build(items, args.cache, args.online, args.mailto)
+    graph = build(items, genres, args.cache, args.online, args.mailto)
     write_outputs(graph, args.out)
     s = graph["stats"]
     print("Graph: %d papers, %d citation edges "
           "(refs resolved for %d, unknown for %d)"
           % (s["papers"], s["edges"], s["refs_resolved"], s["refs_unknown"]))
+    print("Genres: " + ", ".join("%s=%d" % (g["name"], g["count"])
+                                  for g in graph["genres"]))
     print("Wrote %s/graph.json and %s/graph-data.js" % (args.out, args.out))
     if s["edges"] == 0:
         print("NOTE: 0 edges. Run with --online --mailto you@example.com to "

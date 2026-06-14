@@ -1,0 +1,33 @@
+{
+  "_comment": "Research-genre colour rules. EDIT THIS FILE to fit your field. Each paper is assigned to the FIRST genre below whose any 'match' keyword appears in its title+abstract+keywords (case-insensitive). Order = priority (top wins). 'Other' is the catch-all so every paper gets exactly one genre (mutually exclusive + collectively exhaustive). Add/remove genres, reorder for priority, edit keywords and colours freely.",
+  "genres": [
+    { "name": "Clinical trial", "color": "#e4572e",
+      "match": ["randomized", "randomised", "phase i", "phase ii", "phase iii",
+                "phase 1", "phase 2", "phase 3", "placebo", "double-blind",
+                "clinical trial", "cohort study", "efficacy and safety"] },
+    { "name": "DDR", "color": "#2e6fdb",
+      "match": ["dna damage", "dna repair", "homologous recombination",
+                "double-strand", "replication stress", "synthetic lethal",
+                "parp", "brca", " atm ", "atr kinase", "chk1", "chk2",
+                "mismatch repair", "base excision"] },
+    { "name": "TME", "color": "#2ca25f",
+      "match": ["microenvironment", "stroma", "fibroblast", " caf ", "hypoxia",
+                "angiogenesis", "extracellular matrix", "niche", "metasta"] },
+    { "name": "Immunotherapy", "color": "#8456c7",
+      "match": ["immunotherapy", "checkpoint", "pd-1", "pd-l1", "ctla-4",
+                "car-t", "car t", "t cell", "t-cell", "immune evasion",
+                "antitumor immunity", "antitumour immunity", "macrophage"] },
+    { "name": "Genomics", "color": "#ef8a17",
+      "match": ["sequencing", "rna-seq", "scrna", "single-cell", "single cell",
+                "genome", "genomic", "transcriptom", "mutation", "variant",
+                "whole-exome", "whole-genome", "multi-omics", "epigenom"] },
+    { "name": "Method", "color": "#17a2b8",
+      "match": ["algorithm", "framework", "pipeline", "computational",
+                "software", "toolkit", "statistical model", "machine learning",
+                "deep learning", "neural network", "benchmark", "in silico"] },
+    { "name": "Review", "color": "#d6336c",
+      "match": ["review", "systematic review", "meta-analysis", "overview",
+                "perspective", "survey", "hallmarks"] },
+    { "name": "Other", "color": "#8d99ae", "match": [] }
+  ]
+}

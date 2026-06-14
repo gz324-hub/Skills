@@ -1,15 +1,16 @@
 ---
 name: run-zotero-citation-graph
-description: Build, run, refresh, and screenshot the Zotero citation graph — an interactive plot where nodes are papers, arrows are citations, and clicking a node opens the paper. Use when asked to run/build/refresh the citation graph, view the Zotero literature-review graph, regenerate graph.json from a Zotero export, or screenshot the viewer.
+description: Build, run, refresh, and screenshot the Zotero citation graph — an interactive plot where nodes are papers (coloured by research genre, sized by citations), arrows are citations, and clicking a node opens the paper. Use when asked to run/build/refresh the citation graph, view the Zotero literature-review graph, change genre colours, regenerate graph.json from a Zotero export, or screenshot the viewer.
 ---
 
 Interactive citation graph built from a Zotero export: nodes = papers, a
-directed edge **A → B** = "A cites B", node size = times cited within the
+directed edge **A → B** = "A cites B", node **colour** = research genre
+(editable rules in `genres.json`), node **size** = times cited within the
 library, clicking a node opens its DOI/URL. The viewer is one self-contained
-HTML file (vis-network is vendored — no CDN, no server). Drive it headless via
-`.claude/skills/run-zotero-citation-graph/driver.mjs` (Playwright Chromium):
-it renders the graph, screenshots it, and asserts that a node-click opens the
-right paper URL.
+HTML file on a white canvas (vis-network is vendored — no CDN, no server).
+Drive it headless via `.claude/skills/run-zotero-citation-graph/driver.mjs`
+(Playwright Chromium): it renders the graph, screenshots it, and asserts that a
+node-click opens the right paper URL.
 
 All paths below are relative to `zotero-citation-graph/` (the unit dir).
 
@@ -32,16 +33,21 @@ pipeline runs without `npm install`.
 ## Build
 
 The graph data is generated from a Zotero export. For the bundled demo, first
-materialise the sample library + its cached citation data, then build:
+materialise the oncology sample (spans all genres) + its cached citation data,
+then build:
 
 ```bash
-python3 sample/make_sample.py
-python3 build_graph.py --input sample/library.json --out out
+python3 sample/make_oncology.py
+python3 build_graph.py --input sample/oncology.json --out out
 ```
 
 This writes `out/graph.json` and `out/graph-data.js` (the viewer reads the `.js`
 form so it works over `file://` with no server). Expected:
-`10 papers, 18 citation edges`.
+`12 papers, 20 citation edges` and a genre breakdown line
+(`Genres: Clinical trial=2, DDR=2, TME=2, …`). Node colour comes from the
+ordered rules in `genres.json` (first match wins; `Other` is the catch-all, so
+every paper gets exactly one genre). A second sample, `sample/library.json`
+(deep-learning papers, via `make_sample.py`), also exists.
 
 To refresh from a real export (re-run "every now and then"):
 
@@ -80,8 +86,8 @@ Other commands:
 node .claude/skills/run-zotero-citation-graph/driver.mjs shot /tmp/custom-shot.png
 
 # click the node matching a query, report the URL it opens
-node .claude/skills/run-zotero-citation-graph/driver.mjs click "residual"
-#  → • clicked "He 2016" → https://doi.org/10.1109/cvpr.2016.90
+node .claude/skills/run-zotero-citation-graph/driver.mjs click "PARP"
+#  → • clicked "Farmer 2017" → https://doi.org/10.1000/onc.0002
 ```
 
 Override the browser with `CHROME_BIN=/path/to/chrome`, the unit dir with
@@ -102,6 +108,14 @@ shows nothing — use the driver above.)
 
 ## Gotchas
 
+- **Node colour = research genre; node size = citations.** Each paper is
+  classified into exactly one genre by `genres.json` — ordered keyword rules
+  matched over title + abstract + keywords, *first match wins*, with an `Other`
+  catch-all (so the set is mutually exclusive + collectively exhaustive). Edit
+  `genres.json` to retune for a field (rename/reorder genres, change `color`
+  hexes, edit keyword lists). A Zotero tag that exactly equals a genre name
+  forces that genre. The build prints a `Genres: …` breakdown; the viewer's
+  legend is clickable (filters to one genre).
 - **Zotero exports contain no citation graph.** Edges are reconstructed from
   CrossRef reference lists keyed by **DOI**. Papers without a DOI still render
   as nodes but get no auto-discovered citation edges. Tell users to keep DOIs
