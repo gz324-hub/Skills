@@ -11,7 +11,7 @@
           --muted:#5b6675; --accent:#1f6feb; }
   * { box-sizing: border-box; }
   html, body { margin:0; height:100%; background:var(--bg); color:var(--ink);
-    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    font-family: Arial, Helvetica, sans-serif; }
   #app { display:flex; flex-direction:column; height:100vh; }
   header { padding:10px 16px; border-bottom:1px solid var(--line); background:var(--panel);
     display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
@@ -44,7 +44,7 @@
     background: #ffffff !important; color: var(--ink) !important;
     border: 1px solid var(--line) !important; border-radius: 10px !important;
     box-shadow: 0 4px 18px rgba(20,30,50,.16) !important;
-    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif !important;
+    font-family: Arial, Helvetica, sans-serif !important;
     font-size: 15px !important; line-height: 1.5 !important;
   }
 </style>
@@ -100,11 +100,12 @@
   }
 
   const nodes = new vis.DataSet(G.nodes.map(n => ({
-    id: n.id, label: n.label, value: n.value || 1, url: n.url, genre: n.genre,
+    id: n.id, label: "<b>" + n.label + "</b>", value: n.value || 1, url: n.url, genre: n.genre,
     title: tooltip(n),
     color: { background: n.color, border: darken(n.color, 0.65),
              highlight: { background: n.color, border: "#1b2330" } },
-    font: { color: "#1b2330", size: 20, strokeWidth: 5, strokeColor: "#ffffff" },
+    font: { multi: "html", face: "Arial", color: "#1b2330", size: 20,
+            strokeWidth: 5, strokeColor: "#ffffff" },
   })));
   const edges = new vis.DataSet(G.edges.map(e => ({ from: e.from, to: e.to, arrows: "to" })));
 
